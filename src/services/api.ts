@@ -3,7 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "https://v3.football.api-sports.io",
   headers: {
-    "x-rapidapi-key": "TU_API_KEY",
+    "x-rapidapi-key": "11161a3b4e577021db00da9e9fa55f59",
     "x-rapidapi-host": "v3.football.api-sports.io",
   },
 });
