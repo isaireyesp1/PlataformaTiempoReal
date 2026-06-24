@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { getWorldCupMatches } from "../services/api";
+import { getLiveMatches } from "../services/api";
 
 export default function MatchesScreen() {
   const [matches, setMatches] = useState<any[]>([]);
@@ -16,21 +16,42 @@ export default function MatchesScreen() {
   useEffect(() => {
     load();
 
-    const interval = setInterval(load, 30000);
+    const interval = setInterval(load, 10000); // 🔴 más real-time
 
     return () => clearInterval(interval);
   }, []);
 
   const load = async () => {
     try {
-      setLoading(true);
-      const data = await getWorldCupMatches();
+      const data = await getLiveMatches();
       setMatches(data);
     } catch (err) {
       console.log("Error loading matches:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getStatusLabel = (item: any) => {
+    const status = item.fixture.status.short;
+    const elapsed = item.fixture.status.elapsed;
+
+    // 🔴 EN VIVO
+    if (status === "1H" || status === "2H" || status === "LIVE") {
+      return `🔴 EN VIVO • ${elapsed || 0}'`;
+    }
+
+    // ⏳ ENTRETIEMPO
+    if (status === "HT") {
+      return "⏸ DESCANSO";
+    }
+
+    // ✔ TERMINADO
+    if (status === "FT") {
+      return "✔ FINALIZADO";
+    }
+
+    return item.fixture.status.long;
   };
 
   const renderMatch = ({ item }: any) => {
@@ -40,14 +61,18 @@ export default function MatchesScreen() {
     const homeGoals = item.goals.home ?? 0;
     const awayGoals = item.goals.away ?? 0;
 
-    const status = item.fixture.status.long;
+    const isLive =
+      item.fixture.status.short === "1H" ||
+      item.fixture.status.short === "2H";
 
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, isLive && styles.liveCard]}>
+        {/* League */}
         <Text style={styles.league}>
           🏆 {item.league.name}
         </Text>
 
+        {/* Teams + Score */}
         <View style={styles.row}>
           <Text style={styles.team}>{home}</Text>
 
@@ -60,8 +85,9 @@ export default function MatchesScreen() {
           <Text style={styles.team}>{away}</Text>
         </View>
 
-        <Text style={styles.status}>
-          {status}
+        {/* Status */}
+        <Text style={[styles.status, isLive && styles.liveStatus]}>
+          {getStatusLabel(item)}
         </Text>
       </View>
     );
@@ -69,13 +95,13 @@ export default function MatchesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>⚽ Mundial 2026</Text>
+      <Text style={styles.title}>⚽ Live Scores</Text>
 
       {loading && matches.length === 0 ? (
         <ActivityIndicator size="large" color="#22c55e" />
       ) : matches.length === 0 ? (
         <Text style={styles.empty}>
-          No hay partidos disponibles
+          🔴 No hay partidos en vivo ahora mismo
         </Text>
       ) : (
         <FlatList
@@ -112,6 +138,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: "#1f2937",
+  },
+
+  liveCard: {
+    borderColor: "#ef4444",
+    shadowColor: "#ef4444",
+    shadowOpacity: 0.4,
   },
 
   league: {
@@ -151,6 +183,11 @@ const styles = StyleSheet.create({
     color: "#60a5fa",
     fontSize: 12,
     textAlign: "center",
+  },
+
+  liveStatus: {
+    color: "#ef4444",
+    fontWeight: "bold",
   },
 
   empty: {
