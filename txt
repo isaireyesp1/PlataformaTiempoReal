@@ -1,0 +1,31 @@
+&cache_seconds=27
+
+Bug report sencillo
+
+Título: “Error al cargar la página de inicio”
+
+Descripción: “La página no muestra el banner correctamente.”
+
+Solicitud de mejora
+
+Título: “Agregar botón de exportar a PDF”
+
+Descripción: “Sería útil tener un botón para exportar reportes.”
+
+Pregunta técnica
+
+Título: “¿Cómo configuro la base de datos en local?”
+
+Descripción: “No encuentro el archivo .env para la conexión.”
+
+Corrección menor
+
+Título: “Ortografía en el README”
+
+Descripción: “Hay un error en la palabra ‘instalación’.”
+
+Prueba de integración
+
+Título: “Test de login con cuentas externas”
+
+Descripción: “El login con Google no funciona en staging.”
